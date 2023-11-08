@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { CreateEventDto } from './create-event.dto';
 import { UpdateEventDto } from './update-event.dto';
-import { Like, MoreThan, Repository } from 'typeorm';
+import { FindOneOptions, Like, MoreThan, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Event } from './event.entity';
 
@@ -40,6 +40,16 @@ export class EventsController {
         id: 'DESC'
       }
     });
+  }
+
+  @Get('practice2')
+  async practice2() {
+    const options: FindOneOptions<Event> = {
+      where: { id: 1 },
+      relations: ['attendees'],  
+    };
+  
+    return await this.repository.findOne(options);
   }
 
   @Get(':id')
