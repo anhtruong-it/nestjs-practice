@@ -6,6 +6,7 @@ import {
   Get,
   HttpCode,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
 } from '@nestjs/common';
@@ -14,12 +15,17 @@ import { UpdateEventDto } from './update-event.dto';
 import { FindOneOptions, Like, MoreThan, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Event } from './event.entity';
+import { Attendee } from './attendee.entity';
+import { EventsService } from './events.service';
 
 @Controller('/events')
 export class EventsController {
   constructor(
     @InjectRepository(Event)
     private readonly repository: Repository<Event>,
+    @InjectRepository(Attendee)
+    private readonly attendeeRepository: Repository<Attendee>,
+    private readonly eventsService: EventsService
   ) {}
 
   @Get()
@@ -44,17 +50,31 @@ export class EventsController {
 
   @Get('practice2')
   async practice2() {
-    const options: FindOneOptions<Event> = {
-      where: { id: 1 },
-      relations: ['attendees'],  
-    };
+    // const options: FindOneOptions<Event> = {
+    //   where: { id: 1 },
+    //   relations: ['attendees'],  
+    // };
   
-    return await this.repository.findOne(options);
+    // return await this.repository.findOne(options);
+    // const options: FindOneOptions<Event> = {
+    // where: { id: 1 },
+    // };
+    // const event = await this.repository.findOne(options);
+    const event = new Event();
+    event.id = 1;
+
+    const attendee = new Attendee();
+    attendee.name = 'as 2';
+    attendee.event = event;
+
+    await this.attendeeRepository.save(attendee);
+
+    return event;
   }
 
   @Get(':id')
-  async findOne(@Param('id') id) {
-    return await this.repository.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    return await this.eventsService.getEvent(id);
   }
 
   @Post()
