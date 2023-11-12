@@ -1,7 +1,18 @@
 /* eslint-disable prettier/prettier */
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Event } from './event.entity';
 
+export enum AttendeeAnswerEnum {
+  Accepted = 1,
+  Maybe,
+  Rejected,
+}
 @Entity()
 export class Attendee {
   @PrimaryGeneratedColumn()
@@ -11,8 +22,14 @@ export class Attendee {
   name: string;
 
   @ManyToOne(() => Event, (event) => event.attendees, {
-    nullable: false
+    nullable: false,
   })
   @JoinColumn()
   event: Event;
+
+  @Column('enum', {
+    enum: AttendeeAnswerEnum,
+    default: AttendeeAnswerEnum.Accepted,
+  })
+  answer: AttendeeAnswerEnum;
 }
